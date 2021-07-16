@@ -6,5 +6,5 @@ MAIN_PATH = os.path.split(os.path.realpath(__file__))[0]
 
 if __name__ == '__main__':
     t1 = time.time()
-    create_wordcloud_from_frequency(os.path.join(MAIN_PATH, "dist/word_frequency.json"))
+    create_wordcloud_from_frequency(os.path.join(MAIN_PATH, "dist/word_frequency_subset_raw_data.json"))
     print(time.time()-t1)
