@@ -1,4 +1,4 @@
-FROM quentinlp/nlp-repo:latest
+FROM quentinlp/nlp_repo_public_test:latest
 
 RUN mkdir ./dist
 
