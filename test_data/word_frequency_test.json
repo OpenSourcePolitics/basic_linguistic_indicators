@@ -1,1 +1,64 @@
-{"category 1": {"word1": 1, "word2": 5, "mais": 45}, "category 2": {"word1": 5, "word2": 5, "word3": 4, "mais": 2, "et": 75, "voudraient":  20, "voudrions":  10}, "category 3": {"word2": 20, "word1":5, "mais":2, "donc": 6, "et": 30}, "category 4": {"word1": 12, "word2": 1, "word3": 1}, "category 5" : {"word1" : 72}}
+{
+    "word_frequency_preprocessed": {
+        "category 1": {
+            "word1": 1,
+            "word2": 5,
+            "mais": 45
+        },
+        "category 2": {
+            "word1": 5,
+            "word2": 5,
+            "word3": 4,
+            "mais": 2,
+            "et": 75,
+            "voudraient": 20,
+            "voudrions": 10
+        },
+        "category 3": {
+            "word2": 20,
+            "word1": 5,
+            "mais": 2,
+            "donc": 6,
+            "et": 30
+        },
+        "category 4": {
+            "word1": 12,
+            "word2": 1,
+            "word3": 1
+        },
+        "category 5": {
+            "word1": 72
+        }
+    },
+    "word_frequency": {
+        "category 1": {
+            "word1": 1,
+            "word2": 5,
+            "mais": 45
+        },
+        "category 2": {
+            "word1": 5,
+            "word2": 5,
+            "word3": 4,
+            "mais": 2,
+            "et": 75,
+            "voudraient": 20,
+            "voudrions": 10
+        },
+        "category 3": {
+            "word2": 20,
+            "word1": 5,
+            "mais": 2,
+            "donc": 6,
+            "et": 30
+        },
+        "category 4": {
+            "word1": 12,
+            "word2": 1,
+            "word3": 1
+        },
+        "category 5": {
+            "word1": 72
+        }
+    }
+}
