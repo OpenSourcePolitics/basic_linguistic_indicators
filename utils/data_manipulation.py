@@ -1,7 +1,9 @@
 """
 Stores data manipulation functions
 """
-import json
+import os
+
+DATA_MANIPULATION_PATH = os.path.split(os.path.realpath(__file__))[0]
 
 
 def get_list_of_dict_from_categories(initial_dict):
@@ -53,25 +55,24 @@ def aggregate_several_dict(list_of_dict):
     return final_merged_dict
 
 
-def load_data(file_path, category=None):
+def parse_data(word_frequency_by_category, subset_category=None) -> dict:
     """
     From a json object this function will load the data that will be used in
     textual data valuation functions.
-    :param file_path: path to the json file (retrieved from nlp_preprocessing project)
-    :type file_path: str
-    :param category: category specified by the user that subset the global data
+    :param word_frequency_by_category: Data structure storing the preprocessed data
+    and the non preprocessed created with the nlp_preprocessing project loaded either
+    with LocalWordFrequencyDataLoading or ApiWordFrequencyDataLoading
+    :type word_frequency_by_category: WordFrequenciesCategoryMapping
+    :param subset_category: category specified by the user that subset the global data
     :return:dictionary object storing all the vocabulary and its frequency if category is None.
     Otherwise it will store only the vocabulary of a specific category
-    :rtype: dict
     """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        data = json.load(file)
-    if category is None:
-        if len(list(data.keys())) > 1:
-            list_of_dictionaries = get_list_of_dict_from_categories(data)
+    if subset_category is None:
+        if len(list(word_frequency_by_category.keys())) > 1:
+            list_of_dictionaries = get_list_of_dict_from_categories(word_frequency_by_category)
             final_dictionary = aggregate_several_dict(list_of_dictionaries)
         else:
-            final_dictionary = data[list(data.keys())[0]]
+            final_dictionary = word_frequency_by_category[list(word_frequency_by_category.keys())[0]]
     else:
-        final_dictionary = data[category]
+        final_dictionary = word_frequency_by_category[subset_category]
     return final_dictionary
