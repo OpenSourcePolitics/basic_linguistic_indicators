@@ -3,7 +3,8 @@ This file aims to test the functions of the data_manipulation file
 """
 import os
 import pytest
-from utils.data_manipulation import get_list_of_dict_from_categories, aggregate_several_dict, load_data
+from utils.data_manipulation import get_list_of_dict_from_categories, aggregate_several_dict, parse_data
+from utils.word_frequency_data_interface import LocalWordFrequencyDataLoading
 
 TEST_DATA_MANIP_PATH = os.path.split(os.path.realpath(__file__))[0]
 
@@ -15,8 +16,10 @@ INPUT_DATA = {"cat1": {"a": 1, "b": 2, "c": 3},
 
 STORED_TEST_DATA_MULTI_CATEGORIES = os.path.join(TEST_DATA_MANIP_PATH, "../test_data/word_frequency_test.json")
 STORED_TEST_DATA_ONE_CATEGORY = os.path.join(TEST_DATA_MANIP_PATH, "../test_data/word_frequency_test2.json")
-CONFIG_1 = [(STORED_TEST_DATA_MULTI_CATEGORIES, "category 3"), (STORED_TEST_DATA_MULTI_CATEGORIES, None),
-            (STORED_TEST_DATA_ONE_CATEGORY, "category 1"), (STORED_TEST_DATA_ONE_CATEGORY, None)]
+word_frequencies_by_cat_object_config_1 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
+word_frequencies_by_cat_object_config_2 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
+CONFIG_1 = [(word_frequencies_by_cat_object_config_1, "category 3"), (word_frequencies_by_cat_object_config_1, None),
+            (word_frequencies_by_cat_object_config_2, "category 1"), (word_frequencies_by_cat_object_config_2, None)]
 
 
 def test_get_list_from_dict():
@@ -46,15 +49,16 @@ def test_aggregate_several_dictionaries():
     assert len(shared_items) == len(list(merged_dictionary.keys())) and all(shared_items)
 
 
-@pytest.mark.parametrize("file_path, category", CONFIG_1)
-def test_data_loading(file_path, category):
+@pytest.mark.parametrize("word_frequencies_by_cat_object, category", CONFIG_1)
+def test_data_loading(word_frequencies_by_cat_object, category):
     """
-    For several configuration this test checks if the function load_data() is able to
+    For several configuration this test checks if the function parse_data() is able to
     retrieve the data normally and output the correct format.
-    :param file_path: path to the json object storing the data
-    :type file_path: str
+    :param word_frequencies_by_cat_object: path to the json object storing the data
+    :type word_frequencies_by_cat_object:
     :param category: category specified by the user
     :type category: str
     """
-    final_dict = load_data(file_path, category)
-    assert isinstance(final_dict, dict)
+    preprocessed = parse_data(word_frequencies_by_cat_object.preprocessed, category)
+    classical_data = parse_data(word_frequencies_by_cat_object.unprocessed, category)
+    assert isinstance(preprocessed, dict) and isinstance(classical_data, dict)

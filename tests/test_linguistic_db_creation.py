@@ -4,19 +4,27 @@ This file checks that the template is correctly updated with the indicators foun
 import os
 import pytest
 from openpyxl import load_workbook
+from utils.word_frequency_data_interface import LocalWordFrequencyDataLoading
 from linguistic_database.ldb_creation import update_template_xlsx
-
+from main import get_parsed_data
 TEST_PATH_LDB_CREATION = os.path.split(os.path.realpath(__file__))[0]
 STORED_TEST_DATA_MULTI_CATEGORIES = os.path.join(TEST_PATH_LDB_CREATION, "../test_data/word_frequency_test.json")
 STORED_TEST_DATA_ONE_CATEGORY = os.path.join(TEST_PATH_LDB_CREATION, "../test_data/word_frequency_test2.json")
-CONFIG_UPDATE_XLSX_VALIDATION = [(STORED_TEST_DATA_MULTI_CATEGORIES, "category 3",
-                                  ["test", 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-                                 (STORED_TEST_DATA_MULTI_CATEGORIES, None,
-                                  ["test", 321, 0, 0, 0, 0, 0, 30, 0, 0, 0, 49, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-                                 (STORED_TEST_DATA_ONE_CATEGORY, "category 1",
-                                  ["test2", 218, 0, 0, 0, 0, 0, 95, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-                                 (STORED_TEST_DATA_ONE_CATEGORY, None,
-                                  ["test2", 218, 0, 0, 0, 0, 0, 95, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+word_frequencies_by_cat_object_config_1 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_MULTI_CATEGORIES).load()
+word_frequencies_by_cat_object_config_2 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
+
+CONFIG_UPDATE_XLSX_VALIDATION = [(word_frequencies_by_cat_object_config_1, "category 3",
+                                  ["test preprocessed",
+                                   63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                                 (word_frequencies_by_cat_object_config_1, None,
+                                  ["test preprocessed",
+                                   321, 0, 0, 0, 0, 0, 30, 0, 0, 0, 49, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                                 (word_frequencies_by_cat_object_config_2, "category 1",
+                                  ["test preprocessed",
+                                   218, 0, 0, 0, 0, 0, 95, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                                 (word_frequencies_by_cat_object_config_2, None,
+                                  ["test preprocessed",
+                                   218, 0, 0, 0, 0, 0, 95, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                                  ]
 
 
@@ -39,20 +47,23 @@ def get_cells_values(column_letter):
     return written_values, worksheet.title
 
 
-@pytest.mark.parametrize("file_path, category, output", CONFIG_UPDATE_XLSX_VALIDATION)
-def test_update_template(file_path, category, output):
+@pytest.mark.parametrize("word_frequencies_by_cat_object, category, output", CONFIG_UPDATE_XLSX_VALIDATION)
+def test_update_template(word_frequencies_by_cat_object, category, output):
     """
     Checks that all the information that the function update_template_xlsx() is
     supposed to append to the template is correct.
-    :param file_path: path to the json object storing the data
-    :type file_path: str
+    :param word_frequencies_by_cat_object: Data structure storing the preprocessed data
+    and the non preprocessed data loaded with LocalWordFrequencyDataLoading
+    :type word_frequencies_by_cat_object: WordFrequenciesByCategory
     :param category: category specified by the user used to subset the data
     :type category: str
     :param output: ground truth value by config
     :type output: list
     """
+    parsed_data = get_parsed_data(word_frequencies_by_cat_object, category)
     template_path = TEST_PATH_LDB_CREATION + "/../criteria_template.xlsx"
-    update_template_xlsx(template_path=template_path, data_file_path=file_path, category=category)
+    update_template_xlsx(template_path=template_path,
+                         parsed_word_frequency_data=parsed_data.preprocessed, category=category)
     values, title = get_cells_values('C')
     if category is None:
         category = "whole_data"
