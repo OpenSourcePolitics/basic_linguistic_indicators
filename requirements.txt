@@ -26,3 +26,4 @@ wordcloud==1.8.1
 xlrd==2.0.1
 openpyxl~=3.0.7
 pytest-cov~=2.11.1
+Flask==2.0.1
