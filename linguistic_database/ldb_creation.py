@@ -2,8 +2,10 @@
 This file will be responsible of the linguistic
 database creation. It will follow the information available in the template.
 """
+import os
 from openpyxl import load_workbook
 from linguistic_database.ldb_information_retrieval import prepare_data
+LDB_CREATION_PATH = os.path.split(os.path.realpath(__file__))[0]
 
 
 def write_specific_cell(worksheet, list_values, column_letter):
@@ -39,4 +41,4 @@ def update_template_xlsx(template_path: str, parsed_word_frequency_data: dict, c
     # worksheet["C2"] = filename
     list_values = prepare_data(parsed_word_frequency_data)
     write_specific_cell(worksheet=worksheet, list_values=list_values, column_letter='C')
-    workbook.save(filename=template_path)
+    workbook.save(filename=os.path.join(LDB_CREATION_PATH, "../dist/linguistic_database_template.xlsx"))
