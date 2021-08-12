@@ -1,5 +1,7 @@
 FROM quentinlp/nlp_repo_public_test:latest
 
+ENV PYTHONUNBUFFERED 1
+
 RUN mkdir ./dist
 
 RUN mv *.json ./dist
@@ -20,4 +22,10 @@ COPY ./wordclouds_generation ./wordclouds_generation
 
 COPY main.py .
 
-CMD python3.8 ./main.py -f ./dist/nlp_preprocessing_output.json
+COPY app.py .
+
+EXPOSE 8080
+
+ENV PORT 8080
+
+CMD flask run --host=0.0.0.0 -p $PORT
