@@ -2,17 +2,8 @@
 This file is responsible of wordclouds creation
 """
 import os
-from operator import itemgetter
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-
-
-def get_most_common_words(parsed_word_frequency_data: dict, number_of_words=50) -> list:
-    """
-    This function will return the most common words
-    """
-    sorted_data = sorted(parsed_word_frequency_data.items(), key=itemgetter(1), reverse=True)
-    return sorted_data[:number_of_words]
 
 
 def create_wordcloud_from_frequency(parsed_word_frequency_data: dict, category) -> None:

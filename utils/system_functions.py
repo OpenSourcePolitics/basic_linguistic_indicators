@@ -15,5 +15,4 @@ def clean_directory(directory_path):
     """
     former_files = glob.glob(directory_path + "/*")
     for file in former_files:
-        if file.split('.')[1] != "json":
-            os.remove(file)
+        os.remove(file)
