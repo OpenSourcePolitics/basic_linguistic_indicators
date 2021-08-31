@@ -2,6 +2,7 @@
 This file is used to define an Interface that
 will act as an overlay between the script and the input data
 """
+import os
 import json
 from typing import Dict
 from dataclasses import dataclass
@@ -31,6 +32,7 @@ class WordFrequenciesByCategory:
     Data structure used to describe the raw data loaded from
     the api or the local json file.
     """
+    filename: str
     preprocessed: WordFrequenciesCategoryMapping
     unprocessed: WordFrequenciesCategoryMapping
 
@@ -42,6 +44,7 @@ class WordFrequencies:
     the preprocessed data and the classical one
     once the filter on category has been apply (see parse_data)
     """
+    filename: str
     preprocessed: WordFrequencyMapping
     unprocessed: WordFrequencyMapping
 
@@ -53,6 +56,7 @@ class LocalWordFrequencyDataLoading(WordFrequencyLoader):
     """
     def __init__(self, file_path):
         self._file_path = file_path
+        self._filename = os.path.basename(os.path.normpath(os.path.splitext(file_path)[0]))
 
     def load(self) -> WordFrequenciesByCategory:
         """
@@ -63,7 +67,9 @@ class LocalWordFrequencyDataLoading(WordFrequencyLoader):
         """
         with open(self._file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
-        return WordFrequenciesByCategory(data["word_frequency_preprocessed"], data["word_frequency"])
+        return WordFrequenciesByCategory(filename=self._filename,
+                                         preprocessed=data["word_frequency_preprocessed"],
+                                         unprocessed=data["word_frequency"])
 
 
 class ApiWordFrequencyDataLoading(WordFrequencyLoader):
@@ -71,8 +77,9 @@ class ApiWordFrequencyDataLoading(WordFrequencyLoader):
     Implements the main interface WordFrequencyLoader to deal
     with the data that send by a post request to the API
     """
-    def __init__(self, post_request_data):
+    def __init__(self, post_request_data, filename):
         self._post_request_data = post_request_data
+        self._filename = filename
 
     def load(self) -> WordFrequenciesByCategory:
         """
@@ -80,5 +87,6 @@ class ApiWordFrequencyDataLoading(WordFrequencyLoader):
         in case of a post request send by the API and returns both the preprocessed
         word frequencies and the classical one
         """
-        return WordFrequenciesByCategory(self._post_request_data["word_frequency_preprocessed"],
-                                         self._post_request_data["word_frequency"])
+        return WordFrequenciesByCategory(filename=self._filename,
+                                         preprocessed=self._post_request_data["word_frequency_preprocessed"],
+                                         unprocessed=self._post_request_data["word_frequency"])
