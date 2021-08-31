@@ -5,6 +5,7 @@ import os
 import pytest
 from utils.data_manipulation import get_list_of_dict_from_categories, aggregate_several_dict, parse_data
 from utils.word_frequency_data_interface import LocalWordFrequencyDataLoading
+from utils.system_functions import clean_directory
 
 TEST_DATA_MANIP_PATH = os.path.split(os.path.realpath(__file__))[0]
 
@@ -14,10 +15,14 @@ INPUT_DATA = {"cat1": {"a": 1, "b": 2, "c": 3},
               "cat4": {"d": 1, "b": 2, "c": 3},
               "cat5": {"e": 1, "b": 2, "f": 3}}
 
-STORED_TEST_DATA_MULTI_CATEGORIES = os.path.join(TEST_DATA_MANIP_PATH, "../test_data/word_frequency_test.json")
-STORED_TEST_DATA_ONE_CATEGORY = os.path.join(TEST_DATA_MANIP_PATH, "../test_data/word_frequency_test2.json")
-word_frequencies_by_cat_object_config_1 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
+STORED_TEST_DATA_MULTI_CATEGORIES = os.path.join(os.path.dirname(TEST_DATA_MANIP_PATH),
+                                                 "test_data/word_frequency_test.json")
+STORED_TEST_DATA_ONE_CATEGORY = os.path.join(os.path.dirname(TEST_DATA_MANIP_PATH),
+                                             "test_data/word_frequency_test2.json")
+
+word_frequencies_by_cat_object_config_1 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_MULTI_CATEGORIES).load()
 word_frequencies_by_cat_object_config_2 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
+
 CONFIG_1 = [(word_frequencies_by_cat_object_config_1, "category 3"), (word_frequencies_by_cat_object_config_1, None),
             (word_frequencies_by_cat_object_config_2, "category 1"), (word_frequencies_by_cat_object_config_2, None)]
 
@@ -62,3 +67,8 @@ def test_data_loading(word_frequencies_by_cat_object, category):
     preprocessed = parse_data(word_frequencies_by_cat_object.preprocessed, category)
     classical_data = parse_data(word_frequencies_by_cat_object.unprocessed, category)
     assert isinstance(preprocessed, dict) and isinstance(classical_data, dict)
+
+
+def test_clean_directory():
+    clean_directory(os.path.join(os.path.dirname(TEST_DATA_MANIP_PATH), "dist"))
+    assert len(os.listdir(os.path.join(os.path.dirname(TEST_DATA_MANIP_PATH), "dist"))) == 1

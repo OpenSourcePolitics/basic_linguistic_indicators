@@ -7,9 +7,14 @@ from openpyxl import load_workbook
 from utils.word_frequency_data_interface import LocalWordFrequencyDataLoading
 from linguistic_database.ldb_creation import update_template_xlsx
 from main import get_parsed_data
+
 TEST_PATH_LDB_CREATION = os.path.split(os.path.realpath(__file__))[0]
-STORED_TEST_DATA_MULTI_CATEGORIES = os.path.join(TEST_PATH_LDB_CREATION, "../test_data/word_frequency_test.json")
-STORED_TEST_DATA_ONE_CATEGORY = os.path.join(TEST_PATH_LDB_CREATION, "../test_data/word_frequency_test2.json")
+
+STORED_TEST_DATA_MULTI_CATEGORIES = os.path.join(os.path.dirname(TEST_PATH_LDB_CREATION),
+                                                 "test_data/word_frequency_test.json")
+STORED_TEST_DATA_ONE_CATEGORY = os.path.join(os.path.dirname(TEST_PATH_LDB_CREATION),
+                                             "test_data/word_frequency_test2.json")
+
 word_frequencies_by_cat_object_config_1 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_MULTI_CATEGORIES).load()
 word_frequencies_by_cat_object_config_2 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
 
@@ -38,7 +43,7 @@ def get_cells_values(column_letter):
     :rtype: tuple
     """
     written_values = []
-    template_path = TEST_PATH_LDB_CREATION + "/../criteria_template.xlsx"
+    template_path = os.path.join(os.path.dirname(TEST_PATH_LDB_CREATION), "dist/linguistic_database_template.xlsx")
     workbook = load_workbook(filename=template_path)
     worksheet = workbook.active
     written_values.append(worksheet["C2"].value)
@@ -60,11 +65,14 @@ def test_update_template(word_frequencies_by_cat_object, category, output):
     :param output: ground truth value by config
     :type output: list
     """
-    parsed_data = get_parsed_data(word_frequencies_by_cat_object, category)
-    template_path = TEST_PATH_LDB_CREATION + "/../criteria_template.xlsx"
+    parsed_data = get_parsed_data(unparsed_data=word_frequencies_by_cat_object,
+                                  category=category)
+    template_path = os.path.join(os.path.dirname(TEST_PATH_LDB_CREATION), "criteria_template.xlsx")
     update_template_xlsx(template_path=template_path,
-                         parsed_word_frequency_data=parsed_data.preprocessed, category=category)
-    values, title = get_cells_values('C')
+                         parsed_word_frequency_data=parsed_data.preprocessed,
+                         preprocessed_filename='test preprocessed',
+                         category=category)
+    values, sheet_title = get_cells_values('C')
     if category is None:
         category = "whole_data"
-    assert values == output and title == category
+    assert values == output and sheet_title == category
