@@ -25,7 +25,8 @@ def write_specific_cell(worksheet, list_values, column_letter):
         index += 1
 
 
-def update_template_xlsx(template_path: str, parsed_word_frequency_data: dict, category=None):
+def update_template_xlsx(template_path: str, parsed_word_frequency_data: dict,
+                         preprocessed_filename=None, category=None):
     """
     Updates the file criteria_template.xlsx:
         - appends the name of the data file
@@ -38,7 +39,7 @@ def update_template_xlsx(template_path: str, parsed_word_frequency_data: dict, c
         worksheet.title = category
     else:
         worksheet.title = "whole_data"
-    # worksheet["C2"] = filename
+    worksheet["C2"] = preprocessed_filename
     list_values = prepare_data(parsed_word_frequency_data)
     write_specific_cell(worksheet=worksheet, list_values=list_values, column_letter='C')
-    workbook.save(filename=os.path.join(LDB_CREATION_PATH, "../dist/linguistic_database_template.xlsx"))
+    workbook.save(filename=os.path.join(os.path.dirname(LDB_CREATION_PATH), "dist/linguistic_database_template.xlsx"))
