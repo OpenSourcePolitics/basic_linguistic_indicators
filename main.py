@@ -58,8 +58,11 @@ def get_parsed_data(unparsed_data: WordFrequenciesByCategory, category=None) -> 
 
 
 def generate_statistical_insights_from_preprocessed_data(parsed_word_frequency_data_preprocessed: dict,
+                                                         filename=None,
                                                          category=None) -> None:
-    create_wordcloud_from_frequency(parsed_word_frequency_data_preprocessed, category)
+    create_wordcloud_from_frequency(parsed_word_frequency_data_preprocessed,
+                                    filename=filename,
+                                    category=category)
 
 
 def get_linguistic_database_indicators(parsed_word_frequency_data: dict, filename=None, category=None) -> None:

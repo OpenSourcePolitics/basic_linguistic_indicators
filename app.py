@@ -111,7 +111,9 @@ def get_speech_analysis_indicators():
     subset_category = check_subset_category()
     data = load_data_from_post_request(filename=filename, subset_category=subset_category)
     try:
-        get_linguistic_database_indicators(data.unprocessed, subset_category)
+        get_linguistic_database_indicators(parsed_word_frequency_data=data.unprocessed,
+                                           filename=filename,
+                                           category=subset_category)
     except Exception as execution_error:
         print(type(execution_error))
         print(execution_error.args)
@@ -138,7 +140,9 @@ def get_word_clouds():
     data = load_data_from_post_request(filename=filename, subset_category=subset_category)
 
     try:
-        generate_statistical_insights_from_preprocessed_data(data.preprocessed, subset_category)
+        generate_statistical_insights_from_preprocessed_data(parsed_word_frequency_data_preprocessed=data.preprocessed,
+                                                             filename=data.filename,
+                                                             category=subset_category)
     except Exception as execution_error:
         print(type(execution_error))
         print(execution_error.args)
@@ -148,9 +152,9 @@ def get_word_clouds():
             {'message': 'Error executing script'}
         ), 403
     if subset_category is None:
-        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud.png')
+        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud_{}.png'.format(filename))
     else:
-        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud{}.png'.format("_" + subset_category))
+        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud_{}{}.png'.format(filename, "_" + subset_category))
     response = make_response(send_file(
         path_or_file=word_cloud_image,
         mimetype="application/png",

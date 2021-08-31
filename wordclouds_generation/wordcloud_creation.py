@@ -5,8 +5,10 @@ import os
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
+WORDCLOUD_PATH = os.path.split(os.path.realpath(__file__))[0]
 
-def create_wordcloud_from_frequency(parsed_word_frequency_data: dict, category) -> None:
+
+def create_wordcloud_from_frequency(parsed_word_frequency_data: dict, filename=None, category=None) -> None:
     """
     This function is used to create and save an image presenting a word-cloud based
     on a preprocessed file which will be grabbed from another docker image
@@ -17,6 +19,9 @@ def create_wordcloud_from_frequency(parsed_word_frequency_data: dict, category) 
     plt.imshow(word_cloud, interpolation="bilinear")
     plt.axis("off")
     if category is not None:
-        plt.savefig(os.path.join(os.getcwd(), "dist/wordcloud{}.png".format("_"+category)), bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.dirname(WORDCLOUD_PATH), "dist/wordcloud_{}{}.png".format(filename,
+                                                                                                   "_" + category)),
+                    bbox_inches='tight')
     else:
-        plt.savefig(os.path.join(os.getcwd(), "dist/wordcloud.png"), bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.dirname(WORDCLOUD_PATH), "dist/wordcloud_{}.png".format(filename)),
+                    bbox_inches='tight')
