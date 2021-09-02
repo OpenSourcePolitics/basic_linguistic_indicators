@@ -19,16 +19,16 @@ word_frequencies_by_cat_object_config_1 = LocalWordFrequencyDataLoading(STORED_T
 word_frequencies_by_cat_object_config_2 = LocalWordFrequencyDataLoading(STORED_TEST_DATA_ONE_CATEGORY).load()
 
 CONFIG_UPDATE_XLSX_VALIDATION = [(word_frequencies_by_cat_object_config_1, "category 3",
-                                  ["test preprocessed",
+                                  [None,
                                    63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
                                  (word_frequencies_by_cat_object_config_1, None,
-                                  ["test preprocessed",
+                                  [None,
                                    321, 0, 0, 0, 0, 0, 30, 0, 0, 0, 49, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
                                  (word_frequencies_by_cat_object_config_2, "category 1",
-                                  ["test preprocessed",
+                                  [None,
                                    218, 0, 0, 0, 0, 0, 95, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
                                  (word_frequencies_by_cat_object_config_2, None,
-                                  ["test preprocessed",
+                                  [None,
                                    218, 0, 0, 0, 0, 0, 95, 0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                                  ]
 
@@ -70,7 +70,6 @@ def test_update_template(word_frequencies_by_cat_object, category, output):
     template_path = os.path.join(os.path.dirname(TEST_PATH_LDB_CREATION), "criteria_template.xlsx")
     update_template_xlsx(template_path=template_path,
                          parsed_word_frequency_data=parsed_data.preprocessed,
-                         preprocessed_filename='test preprocessed',
                          category=category)
     values, sheet_title = get_cells_values('C')
     if category is None:

@@ -16,14 +16,6 @@ API_PATH = os.path.split(os.path.realpath(__file__))[0]
 app = Flask(__name__)
 
 
-def check_filename():
-    if "filename" not in request.args:
-        filename = "No filename provided"
-    else:
-        filename = request.args['filename']
-    return filename
-
-
 def check_subset_category():
     if "subset_category" not in request.args:
         subset_category = None
@@ -32,8 +24,8 @@ def check_subset_category():
     return subset_category
 
 
-def load_data_from_post_request(filename, subset_category):
-    raw_data = ApiWordFrequencyDataLoading(filename=filename, post_request_data=request.get_json()).load()
+def load_data_from_post_request(subset_category):
+    raw_data = ApiWordFrequencyDataLoading(post_request_data=request.get_json()).load()
     parsed_data = get_parsed_data(raw_data, subset_category)
     return parsed_data
 
@@ -78,13 +70,11 @@ def get_all_indicators():
     :return: Send the contents of a file to the client. see send_file documentation
     for further information
     """
-    filename = check_filename()
     subset_category = check_subset_category()
     data = request.get_json()
 
     try:
         get_all_statistical_indicators_from_api(post_request_data=data,
-                                                filename=filename,
                                                 category=subset_category)
     except Exception as execution_error:
         print(type(execution_error))
@@ -107,12 +97,10 @@ def get_all_indicators():
 
 @app.route('/ldb', methods=["POST"])
 def get_speech_analysis_indicators():
-    filename = check_filename()
     subset_category = check_subset_category()
-    data = load_data_from_post_request(filename=filename, subset_category=subset_category)
+    data = load_data_from_post_request(subset_category=subset_category)
     try:
         get_linguistic_database_indicators(parsed_word_frequency_data=data.unprocessed,
-                                           filename=filename,
                                            category=subset_category)
     except Exception as execution_error:
         print(type(execution_error))
@@ -135,13 +123,11 @@ def get_speech_analysis_indicators():
 
 @app.route('/wordclouds', methods=["POST"])
 def get_word_clouds():
-    filename = check_filename()
     subset_category = check_subset_category()
-    data = load_data_from_post_request(filename=filename, subset_category=subset_category)
+    data = load_data_from_post_request(subset_category=subset_category)
 
     try:
         generate_statistical_insights_from_preprocessed_data(parsed_word_frequency_data_preprocessed=data.preprocessed,
-                                                             filename=data.filename,
                                                              category=subset_category)
     except Exception as execution_error:
         print(type(execution_error))
@@ -152,9 +138,9 @@ def get_word_clouds():
             {'message': 'Error executing script'}
         ), 403
     if subset_category is None:
-        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud_{}.png'.format(filename))
+        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud.png')
     else:
-        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud_{}{}.png'.format(filename, "_" + subset_category))
+        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud{}.png'.format("_" + subset_category))
     response = make_response(send_file(
         path_or_file=word_cloud_image,
         mimetype="application/png",
