@@ -54,7 +54,7 @@ def check_correct_data(func):
     def wrapped(*args, **kwargs):
         data = request.get_json()
         if data is None:
-            return jsonify({'message': 'Invalid data'}), 403
+            return jsonify({'message': 'Invalid data'}), 400
         return func(*args, **kwargs)
 
     return wrapped
@@ -82,8 +82,8 @@ def get_all_indicators():
         traceback.print_exc(file=sys.stdout)
         print(execution_error)
         return jsonify(
-            {'message': 'Error executing script'}
-        ), 403
+            {'message': 'An unexpected error occured'}
+        ), 500
     parsed_file = os.path.join(API_PATH, 'dist/basic_linguistic_indicators.zip')
     response = make_response(send_file(
         path_or_file=parsed_file,
@@ -102,23 +102,24 @@ def get_speech_analysis_indicators():
     try:
         get_linguistic_database_indicators(parsed_word_frequency_data=data.unprocessed,
                                            category=subset_category)
+
+        speech_analysis_data = os.path.join(API_PATH, 'dist/linguistic_database_template.xlsx')
+        response = make_response(send_file(
+            path_or_file=speech_analysis_data,
+            mimetype="application/vnd.ms-excel",
+            as_attachment=True,
+            download_name="ldb_indicators.xlsx"
+        ))
+        response.headers['Content-Disposition'] = "attachment; filename=ldb_indicators.xlsx"
+        return response
     except Exception as execution_error:
         print(type(execution_error))
         print(execution_error.args)
         traceback.print_exc(file=sys.stdout)
         print(execution_error)
         return jsonify(
-            {'message': 'Error executing script'}
-        ), 403
-    speech_analysis_data = os.path.join(API_PATH, 'dist/linguistic_database_template.xlsx')
-    response = make_response(send_file(
-        path_or_file=speech_analysis_data,
-        mimetype="application/vnd.ms-excel",
-        as_attachment=True,
-        download_name="ldb_indicators.xlsx"
-    ))
-    response.headers['Content-Disposition'] = "attachment; filename=ldb_indicators.xlsx"
-    return response
+           {'message': 'An unexpected error occured'}
+       ), 500
 
 
 @app.route('/wordclouds', methods=["POST"])
@@ -129,27 +130,29 @@ def get_word_clouds():
     try:
         generate_statistical_insights_from_preprocessed_data(parsed_word_frequency_data_preprocessed=data.preprocessed,
                                                              category=subset_category)
+
+        if subset_category is None:
+            word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud.png')
+        else:
+            word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud{}.png'.format("_" + subset_category))
+
+        response = make_response(send_file(
+            path_or_file=word_cloud_image,
+            mimetype="application/png",
+            as_attachment=True,
+            download_name="wordcloud"
+        ))
+        response.headers['Content-Disposition'] = "attachment; filename=wordcloud"
+
+        return response
     except Exception as execution_error:
         print(type(execution_error))
         print(execution_error.args)
         traceback.print_exc(file=sys.stdout)
         print(execution_error)
         return jsonify(
-            {'message': 'Error executing script'}
-        ), 403
-    if subset_category is None:
-        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud.png')
-    else:
-        word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud{}.png'.format("_" + subset_category))
-    response = make_response(send_file(
-        path_or_file=word_cloud_image,
-        mimetype="application/png",
-        as_attachment=True,
-        download_name="wordcloud"
-    ))
-    response.headers['Content-Disposition'] = "attachment; filename=wordcloud"
-    return response
-
+           {'message': 'An unexpected error occured'}
+        ), 500
 
 if __name__ == "__main__":
     app.run()
