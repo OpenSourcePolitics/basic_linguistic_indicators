@@ -1,0 +1,22 @@
+{
+    "word_frequency_preprocessed": {
+        "category 1": {
+            "word1": 1,
+            "word2": 5,
+            "mais": 45,
+            "word3": 72,
+            "voudrait": 52,
+            "pourriez": 43
+        }
+    },
+    "word_frequency": {
+        "category 1": {
+            "word1": 1,
+            "word2": 5,
+            "mais": 45,
+            "word3": 72,
+            "voudrait": 52,
+            "pourriez": 43
+        }
+    }
+}
