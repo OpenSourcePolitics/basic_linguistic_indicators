@@ -52,23 +52,19 @@ def parse_cli_arguments() -> argparse.Namespace:
 
 
 def get_parsed_data(unparsed_data: WordFrequenciesByCategory, category=None) -> WordFrequencies:
-    return WordFrequencies(filename=unparsed_data.filename,
-                           preprocessed=parse_data(unparsed_data.preprocessed, category),
+    return WordFrequencies(preprocessed=parse_data(unparsed_data.preprocessed, category),
                            unprocessed=parse_data(unparsed_data.unprocessed, category))
 
 
 def generate_statistical_insights_from_preprocessed_data(parsed_word_frequency_data_preprocessed: dict,
-                                                         filename=None,
                                                          category=None) -> None:
     create_wordcloud_from_frequency(parsed_word_frequency_data_preprocessed,
-                                    filename=filename,
                                     category=category)
 
 
-def get_linguistic_database_indicators(parsed_word_frequency_data: dict, filename=None, category=None) -> None:
+def get_linguistic_database_indicators(parsed_word_frequency_data: dict, category=None) -> None:
     update_template_xlsx(template_path=os.path.join(MAIN_PATH, "criteria_template.xlsx"),
                          parsed_word_frequency_data=parsed_word_frequency_data,
-                         preprocessed_filename=filename,
                          category=category)
 
 
@@ -76,15 +72,15 @@ def get_all_statistical_indicators_from_file(local_file_path: str, category=None
     unparsed_data = LocalWordFrequencyDataLoading(local_file_path).load()
     parsed_data = get_parsed_data(unparsed_data, category)
     generate_statistical_insights_from_preprocessed_data(parsed_data.preprocessed, category)
-    get_linguistic_database_indicators(parsed_data.unprocessed, parsed_data.filename, category)
+    get_linguistic_database_indicators(parsed_data.unprocessed, category)
     prepare_archive()
 
 
-def get_all_statistical_indicators_from_api(post_request_data: dict, category=None, filename=None):
-    unparsed_data = ApiWordFrequencyDataLoading(post_request_data=post_request_data, filename=filename).load()
+def get_all_statistical_indicators_from_api(post_request_data: dict, category=None):
+    unparsed_data = ApiWordFrequencyDataLoading(post_request_data=post_request_data).load()
     parsed_data = get_parsed_data(unparsed_data, category)
     generate_statistical_insights_from_preprocessed_data(parsed_data.preprocessed, category)
-    get_linguistic_database_indicators(parsed_data.unprocessed, parsed_data.filename, category)
+    get_linguistic_database_indicators(parsed_data.unprocessed, category)
     prepare_archive()
 
 
