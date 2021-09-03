@@ -4,6 +4,8 @@ Project API
 import os
 import sys
 import traceback
+import requests
+from dotenv import load_dotenv
 from functools import wraps
 from flask import Flask, jsonify, request, send_file, make_response
 from utils.word_frequency_data_interface import ApiWordFrequencyDataLoading
@@ -13,8 +15,21 @@ from main import get_all_statistical_indicators_from_api, \
 from utils.system_functions import clean_directory
 
 API_PATH = os.path.split(os.path.realpath(__file__))[0]
+
+load_dotenv()
 app = Flask(__name__)
 
+def required_params_are_present(request_args):
+    if len(request_args) < 1:
+        return False
+
+    if 'token' in request_args and 'analysis_id' in request_args:
+        if request_args["token"] == "" or request_args["analysis_id"] == "":
+            return False
+        else:
+            return True
+    else:
+        return False
 
 def check_subset_category():
     if "subset_category" not in request.args:
@@ -23,6 +38,9 @@ def check_subset_category():
         subset_category = request.args['subset_category']
     return subset_category
 
+def load_preprocessed_data(filenmae) -> dict:
+    with open(os.path.join(API_PATH, filename), 'r', encoding='utf-8') as file:
+        return json.load(file)
 
 def load_data_from_post_request(subset_category):
     raw_data = ApiWordFrequencyDataLoading(post_request_data=request.get_json()).load()
@@ -70,12 +88,31 @@ def get_all_indicators():
     :return: Send the contents of a file to the client. see send_file documentation
     for further information
     """
-    subset_category = check_subset_category()
-    data = request.get_json()
-
     try:
+        if required_params_are_present(request.args):
+            params = {
+                "token": request.args['token'],
+                "analysis_id": request.args['analysis_id']
+            }
+        else:
+            return jsonify({'message': 'Required params are missing or invalid'}), 400
+
+        subset_category = check_subset_category()
+        data = request.get_json()
+
         get_all_statistical_indicators_from_api(post_request_data=data,
                                                 category=subset_category)
+
+        parsed_file = os.path.join(API_PATH, 'dist/basic_linguistic_indicators.zip')
+        requests.post(os.environ.get('RAILS_APP_ENDPOINT'), params=params, files={"archive": ("basic_linguistic_indicators.zip", open(parsed_file, 'rb'))})
+        response = make_response(send_file(
+            path_or_file=parsed_file,
+            mimetype="application/zip",
+            as_attachment=True,
+            download_name="basic_linguistic_indicators"
+        ))
+        response.headers['Content-Disposition'] = "attachment; filename=basic_linguistic_indicators"
+        return response
     except Exception as execution_error:
         print(type(execution_error))
         print(execution_error.args)
@@ -84,26 +121,28 @@ def get_all_indicators():
         return jsonify(
             {'message': 'An unexpected error occured'}
         ), 500
-    parsed_file = os.path.join(API_PATH, 'dist/basic_linguistic_indicators.zip')
-    response = make_response(send_file(
-        path_or_file=parsed_file,
-        mimetype="application/zip",
-        as_attachment=True,
-        download_name="basic_linguistic_indicators"
-    ))
-    response.headers['Content-Disposition'] = "attachment; filename=basic_linguistic_indicators"
-    return response
+
 
 
 @app.route('/ldb', methods=["POST"])
 def get_speech_analysis_indicators():
-    subset_category = check_subset_category()
-    data = load_data_from_post_request(subset_category=subset_category)
     try:
+        if required_params_are_present(request.args):
+            params = {
+                "token": request.args['token'],
+                "analysis_id": request.args['analysis_id']
+            }
+        else:
+            return jsonify({'message': 'Required params are missing or invalid'}), 400
+
+        subset_category = check_subset_category()
+        data = load_data_from_post_request(subset_category=subset_category)
+
         get_linguistic_database_indicators(parsed_word_frequency_data=data.unprocessed,
                                            category=subset_category)
 
         speech_analysis_data = os.path.join(API_PATH, 'dist/linguistic_database_template.xlsx')
+        requests.post(os.environ.get('RAILS_APP_ENDPOINT'), params=params, files={"archive": ("linguistic_database_template.xlsx", open(speech_analysis_data, 'rb'))})
         response = make_response(send_file(
             path_or_file=speech_analysis_data,
             mimetype="application/vnd.ms-excel",
@@ -124,10 +163,10 @@ def get_speech_analysis_indicators():
 
 @app.route('/wordclouds', methods=["POST"])
 def get_word_clouds():
-    subset_category = check_subset_category()
-    data = load_data_from_post_request(subset_category=subset_category)
-
     try:
+        subset_category = check_subset_category()
+        data = load_data_from_post_request(subset_category=subset_category)
+
         generate_statistical_insights_from_preprocessed_data(parsed_word_frequency_data_preprocessed=data.preprocessed,
                                                              category=subset_category)
 
@@ -136,6 +175,7 @@ def get_word_clouds():
         else:
             word_cloud_image = os.path.join(API_PATH, 'dist/wordcloud{}.png'.format("_" + subset_category))
 
+        requests.post(os.environ.get('RAILS_APP_ENDPOINT'), params=params, files={"archive": ("wordcloud.png", open(word_cloud_image, 'rb'))})
         response = make_response(send_file(
             path_or_file=word_cloud_image,
             mimetype="application/png",
