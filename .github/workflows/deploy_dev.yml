@@ -17,7 +17,7 @@ jobs:
         GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
         TAG=$(echo "$GIT_BRANCH" | cut -d "/" -f2)
         docker login ${{ secrets.REGISTRY_ENDPOINT }} -u userdoesnotmatter -p ${{ secrets.TOKEN }}
-        docker build . --compress --tag $TAG
+        docker build . --compress --tag "${{ secrets.REGISTRY_ENDPOINT }}/${{ secrets.REGISTRY_NAMESPACE }}/${{ secrets.IMAGE_NAME }}:$TAG"
         docker push "${{ secrets.REGISTRY_ENDPOINT }}/${{ secrets.REGISTRY_NAMESPACE }}/${{ secrets.IMAGE_NAME }}:$TAG"
     - name: Deploy container
       run: |
