@@ -164,6 +164,13 @@ def get_speech_analysis_indicators():
 @app.route('/wordclouds', methods=["POST"])
 def get_word_clouds():
     try:
+        if required_params_are_present(request.args):
+            params = {
+                "token": request.args['token'],
+                "analysis_id": request.args['analysis_id']
+            }
+        else:
+            return jsonify({'message': 'Required params are missing or invalid'}), 400
         subset_category = check_subset_category()
         data = load_data_from_post_request(subset_category=subset_category)
 
