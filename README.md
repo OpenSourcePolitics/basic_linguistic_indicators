@@ -33,4 +33,18 @@ curl --location --request POST 'http://0.0.0.0:8080/' \
 ```
 
 At the end of process, you should have a new zip file named `easy_wordclouds.zip`.
-s
+
+## Configure CD with Github Secrets
+
+This Continuous Deployment workflows requires some secrets to work. Here is the list of secrets required: 
+
+- `REGISTRY_ENDPOINT`: Registry endpoint for container image 
+- `REGISTRY_NAMESPACE`: Registry namespace for container image
+- `IMAGE_NAME`: Image name to push on registry
+- `PRODUCTION_TAG`: Tag name when CD is executing for production image
+- `DEVELOPMENT_TAG`: Tag name when CD is executing for development image
+- `TOKEN`: Token for authenticating on the registry
+
+You can easily set up your secrets on the repository using the web interface : Settings > Secrets > New repository secret
+
+Or you can use the [Github CLI](https://github.com/cli/cli) to [define secret on repository](https://cli.github.com/manual/gh_secret_set).
