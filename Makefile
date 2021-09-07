@@ -10,9 +10,12 @@ REGISTRY_TAG := $(REGISTRY_ENDPOINT)/$(REGISTRY_NAMESPACE)/$(IMAGE_NAME):$(VERSI
 build:
 	docker build -t $(IMAGE_NAME) . --compress --tag $(REGISTRY_TAG)
 
+run:
+	docker run -it -e PORT=$(PORT) -p $(PORT):$(PORT) -v ${PWD}/dist:/basic_linguistic_indicators/dist --rm $(REGISTRY_TAG)
+
 start:
 	@make build
-	docker run --rm -p $(PORT):$(PORT) -v ${PWD}/dist:/basic_linguistic_indicators/dist $(IMAGE_NAME)
+	@make run
 
 test:
 	pytest $(find **/*.py) --cov=. --cov-fail-under=90 --cov-report term-missing
