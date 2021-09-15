@@ -14,10 +14,20 @@ from main import get_all_statistical_indicators_from_api, \
     generate_statistical_insights_from_preprocessed_data, \
     get_linguistic_database_indicators, get_parsed_data
 from utils.system_functions import clean_directory
+import sentry_sdk
+from flask import Flask
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 API_PATH = os.path.split(os.path.realpath(__file__))[0]
 
 load_dotenv()
+
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    integrations=[FlaskIntegration()],
+    traces_sample_rate=1.0
+)
+
 app = Flask(__name__)
 
 def required_params_are_present(request_args):
