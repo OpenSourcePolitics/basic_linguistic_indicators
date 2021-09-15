@@ -3,7 +3,7 @@ Project API
 """
 import os
 import sys
-import html
+import urllib.parse
 import traceback
 import requests
 from dotenv import load_dotenv
@@ -36,7 +36,7 @@ def check_subset_category():
     if "subset_category" not in request.args:
         subset_category = None
     else:
-        subset_category = html.unescape(request.args['subset_category'])
+        subset_category = urllib.parse.unquote_plus(request.args['subset_category'])
     return subset_category
 
 def load_preprocessed_data(filenmae) -> dict:
