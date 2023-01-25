@@ -38,7 +38,7 @@ stanza==1.2.1
 toml==0.10.2
 torch==1.9.0
 tqdm==4.61.1
-typing-extensions==3.10.0.0
+typing_extensions==4.4.0
 urllib3==1.26.5
 Werkzeug==2.0.1
 wordcloud==1.8.1
