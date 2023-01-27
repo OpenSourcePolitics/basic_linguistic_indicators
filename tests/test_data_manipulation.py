@@ -70,5 +70,9 @@ def test_data_loading(word_frequencies_by_cat_object, category):
 
 
 def test_clean_directory():
+    """
+    This test checks if the function clean_directory() is able to delete all the files
+    :return:
+    """
     clean_directory(os.path.join(os.path.dirname(TEST_DATA_MANIP_PATH), "dist"))
     assert len(os.listdir(os.path.join(os.path.dirname(TEST_DATA_MANIP_PATH), "dist"))) == 1
