@@ -17,10 +17,10 @@ start:
 	@make build
 	@make run
 
-test:
+local-test:
 	pytest $(find **/*.py) --cov=. --cov-fail-under=90 --cov-report term-missing
 
-lint:
+local-lint:
 	pylint ./**/*.py
 
 dep:
@@ -37,3 +37,12 @@ deploy:
 	@make login
 	@make build
 	@make push-scw
+
+bash:
+	docker run -it -e RAILS_APP_ENDPOINT=$(RAILS_APP_ENDPOINT) --rm $(REGISTRY_TAG) /bin/bash
+
+test:
+	docker run -it --rm $(REGISTRY_TAG) /bin/bash -c "pytest tests --cov=. --cov-fail-under=75 --cov-report term-missing"
+
+lint:
+	docker run -it --rm $(REGISTRY_TAG) /bin/bash -c "pip install pylint && pylint ./**/*.py"
