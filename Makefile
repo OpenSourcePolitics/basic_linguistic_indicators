@@ -45,4 +45,4 @@ test:
 	docker run -it --rm $(REGISTRY_TAG) /bin/bash -c "pytest tests --cov=. --cov-fail-under=75 --cov-report term-missing"
 
 lint:
-	docker run -it --rm $(REGISTRY_TAG) /bin/bash -c "pip install pylint && pylint ./**/*.py"
+	docker run -it --rm $(REGISTRY_TAG) /bin/bash -c "pylint ./**/*.py"
