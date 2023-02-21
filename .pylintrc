@@ -75,6 +75,8 @@ confidence=
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 disable=unnecessary-pass,
+        missing-function-docstring,
+        pointless-string-statement,
         raw-checker-failed,
         bad-inline-option,
         locally-disabled,
